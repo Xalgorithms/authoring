@@ -21,9 +21,6 @@
   "author": "Hayk Pilosyan <hayk.pilos@gmail.com>",
   "license": "MIT",
   "config": {
-    "ghooks": {
-      "pre-commit": "npm run test"
-    },
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"
     }
