@@ -1,0 +1,28 @@
+{
+  "name": "authoring",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@octokit/rest": "15.6.2",
+    "cors": "2.8.4",
+    "express": "4.16.3",
+    "github-webhook-handler": "0.7.1",
+    "jsonwebtoken": "8.2.1"
+  },
+  "devDependencies": {
+    "commitizen": "2.9.6",
+    "cz-conventional-changelog": "2.1.0",
+    "ghooks": "2.0.4"
+  },
+  "scripts": {
+    "commit": "git-cz"
+  },
+  "author": "Hayk Pilosyan <hayk.pilos@gmail.com>",
+  "license": "MIT",
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  }
+}
