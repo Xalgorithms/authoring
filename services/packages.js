@@ -15,6 +15,7 @@
 // permissions and limitations under the License.
 
 const octokit = require('@octokit/rest')();
+const axios = require('axios');
 
 const config = require('../config');
 
@@ -58,6 +59,35 @@ async function getPackages() {
   }, {});
 }
 
+async function getContents(path) {
+  const {data} = await octokit.repos.getContent({
+    owner: config.OWNER,
+    repo: config.REPO,
+    path
+  });
+
+  const res = await axios.get(data.download_url);
+
+  return Object.assign({file_content: res.data}, data);
+}
+
+async function storeContents(payload) {
+  const {path, file_content: content, sha} = payload;
+  const message = "New change";
+  const {data} = await octokit.repos.updateFile({
+    owner: config.OWNER,
+    repo: config.REPO,
+    path,
+    message,
+    content,
+    sha
+  });
+
+  return data;
+}
+
 module.exports = {
   getPackages,
+  getContents,
+  storeContents,
 };

@@ -17,9 +17,10 @@
 const createHandler = require('github-webhook-handler');
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const auth = require('./services/auth');
-const { getPackages } = require('./services/packages');
+const { getPackages, getContents, storeContents } = require('./services/packages');
 
 const app = express();
 
@@ -31,12 +32,34 @@ const handler = createHandler({
 auth.init();
 
 app.use(handler);
-app.use(cors())
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/package', function (req, res) {
   getPackages().then((packages) => {
     res.json(Object.values(packages));
   });
-})
+});
+
+app.get('/contents', function (req, res) {
+  const path = req.query.path;
+
+  getContents(path).then((contents) => {
+    res.json(contents);
+  }).catch((err) => {
+    console.log("ERR", err)
+  });
+});
+
+app.post('/contents', function (req, res) {
+  const { payload } = req.body;
+
+  storeContents(payload).then((data) => {
+    res.json(data);
+  }).catch((err) => {
+    console.log("ERR", err)
+  });
+});
 
 app.listen(process.env.PORT || 7777, () => console.log('Example app listening on port 7777!'));
