@@ -15,11 +15,7 @@
 // permissions and limitations under the License.
 
 module.exports = {
-  APP_ID: 12531,
-  OAUTH: {
-    KEY: '',
-    SECRET: '',
-  },
+  APP_ID: 13982,
   OWNER: 'hpilosyan',
   REPO: 'libgit2-test',
 };

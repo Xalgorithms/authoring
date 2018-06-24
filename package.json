@@ -9,6 +9,8 @@
     "body-parser": "1.18.3",
     "cors": "2.8.4",
     "express": "4.16.3",
+    "faker": "4.1.0",
+    "firebase-admin": "5.12.1",
     "github-webhook-handler": "0.7.1",
     "jsonwebtoken": "8.2.1"
   },

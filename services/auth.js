@@ -14,7 +14,6 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-const octokit = require('@octokit/rest')();
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
@@ -31,21 +30,30 @@ function generateJwt (id, cert) {
   return jwt.sign(payload, cert,  {algorithm: 'RS256' })
 }
 
-function init() {
+async function init(octokit) {
   const token = getToken();
 
-  // For server to server
   octokit.authenticate({
     type: 'app',
     token: token,
   });
 
-  // For user to server
+  const installationId = await getInstallationId(octokit);
+  const {data: {token: access_token}} = await octokit.apps.createInstallationToken({installation_id: installationId});
+
   octokit.authenticate({
-    type: 'oauth',
-    key: config.OAUTH.KEY,
-    secret: config.OAUTH.SECRET,
+    type: 'token',
+    token: access_token,
   });
+}
+
+async function getInstallationId(octokit) {
+  const {data: installations} = await octokit.apps.getInstallations();
+  const installation = installations.find(function (i) {
+    return i.app_id === config.APP_ID;
+  });
+
+  return installation && installation.id;
 }
 
 function getToken() {
