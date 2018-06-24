@@ -19,7 +19,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const { getPackages, getContents, storeContents } = require('./services/packages');
+const { getPackages } = require('./services/packages');
 const { storeState, fetchState } = require('./services/firestore');
 
 const app = express();
