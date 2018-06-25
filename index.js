@@ -43,8 +43,8 @@ app.get('/package', function (req, res) {
 app.post('/package', function (req, res) {
   const {name} = req.body;
 
-  createPackage(name).then((package) => {
-    res.json(package);
+  createPackage(name).then((packages) => {
+    res.json(Object.values(packages));
   });
 });
 
