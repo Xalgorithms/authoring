@@ -70,7 +70,7 @@ async function createPackage(name) {
   const path = `${name}/${name}.package`;
   const content = utils.base64encode('');
 
-  const {data} = await octokit.repos.createFile({
+  await octokit.repos.createFile({
     owner: config.OWNER,
     repo: config.REPO,
     path,
@@ -78,7 +78,9 @@ async function createPackage(name) {
     content,
   });
 
-  return data;
+  const packages = await getPackages();
+
+  return packages;
 }
 
 async function createFile(path, content) {
