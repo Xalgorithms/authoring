@@ -14,10 +14,15 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-const octokit = require('@octokit/rest')();
-const axios = require('axios');
+const octokit = require('@octokit/rest')({
+  debug: true
+});
 
 const config = require('../config');
+const auth = require('./auth');
+const utils = require('./utils');
+
+auth.init(octokit);
 
 async function getPackages() {
   const {data: commits} = await octokit.repos.getCommits({
@@ -59,35 +64,57 @@ async function getPackages() {
   }, {});
 }
 
-async function getContents(path) {
-  const {data} = await octokit.repos.getContent({
+async function createFile(path, content) {
+  const message = "New change";
+  const {data} = await octokit.repos.createFile({
     owner: config.OWNER,
     repo: config.REPO,
-    path
+    path,
+    message,
+    content: utils.base64encode(content),
   });
 
-  const res = await axios.get(data.download_url);
-
-  return Object.assign({file_content: res.data}, data);
+  return data;
 }
 
-async function storeContents(payload) {
-  const {path, file_content: content, sha} = payload;
+async function updateFile(path, content, sha) {
   const message = "New change";
   const {data} = await octokit.repos.updateFile({
     owner: config.OWNER,
     repo: config.REPO,
     path,
     message,
-    content,
+    content: utils.base64encode(content),
     sha
   });
 
   return data;
 }
 
+async function getPackageInfo(path) {
+  const {data} = await octokit.repos.getContent({
+    owner: config.OWNER,
+    repo: config.REPO,
+    path,
+  });
+
+  return data;
+}
+
+async function createNewFileOrUpdate(packageName, path, content) {
+  const packageInfo = await getPackageInfo(packageName);
+  const file = packageInfo.find(function (p) {
+    return p.path === path;
+  });
+
+  if (!file) {
+    return await createFile(path, content);
+  }
+
+  return await updateFile(path, content, file.sha);
+}
+
 module.exports = {
   getPackages,
-  getContents,
-  storeContents,
+  createNewFileOrUpdate,
 };

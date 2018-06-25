@@ -19,8 +19,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const auth = require('./services/auth');
-const { getPackages, getContents, storeContents } = require('./services/packages');
+const { getPackages } = require('./services/packages');
+const { storeState, fetchState } = require('./services/firestore');
 
 const app = express();
 
@@ -28,8 +28,6 @@ const handler = createHandler({
   path: '/',
   secret: process.env.WEBHOOK_SECRET || 'random',
 });
-
-auth.init();
 
 app.use(handler);
 app.use(cors());
@@ -42,20 +40,25 @@ app.get('/package', function (req, res) {
   });
 });
 
-app.get('/contents', function (req, res) {
-  const path = req.query.path;
+app.get('/state/:name', function (req, res) {
+  const name = req.params.name;
 
-  getContents(path).then((contents) => {
-    res.json(contents);
-  }).catch((err) => {
-    console.log("ERR", err)
+  fetchState(name).then(doc => {
+    if (!doc.exists) {
+      res.status(404).json({});
+    } else {
+      res.send(doc.data());
+    }
+  })
+  .catch(err => {
+    console.log('ERR', err);
   });
 });
 
-app.post('/contents', function (req, res) {
-  const { payload } = req.body;
+app.post('/state', function (req, res) {
+  const { id, payload } = req.body;
 
-  storeContents(payload).then((data) => {
+  storeState(id, payload).then((data) => {
     res.json(data);
   }).catch((err) => {
     console.log("ERR", err)
