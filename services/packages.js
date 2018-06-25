@@ -64,6 +64,23 @@ async function getPackages() {
   }, {});
 }
 
+async function createPackage(name) {
+  const message = "New package";
+  // Create empty package file
+  const path = `${name}/${name}.package`;
+  const content = utils.base64encode('');
+
+  const {data} = await octokit.repos.createFile({
+    owner: config.OWNER,
+    repo: config.REPO,
+    path,
+    message,
+    content,
+  });
+
+  return data;
+}
+
 async function createFile(path, content) {
   const message = "New change";
   const {data} = await octokit.repos.createFile({
@@ -116,5 +133,6 @@ async function createNewFileOrUpdate(packageName, path, content) {
 
 module.exports = {
   getPackages,
+  createPackage,
   createNewFileOrUpdate,
 };

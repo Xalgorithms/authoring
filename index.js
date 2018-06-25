@@ -19,7 +19,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const { getPackages } = require('./services/packages');
+const { getPackages, createPackage } = require('./services/packages');
 const { storeState, fetchState } = require('./services/firestore');
 
 const app = express();
@@ -37,6 +37,14 @@ app.use(bodyParser.json());
 app.get('/package', function (req, res) {
   getPackages().then((packages) => {
     res.json(Object.values(packages));
+  });
+});
+
+app.post('/package', function (req, res) {
+  const {name} = req.body;
+
+  createPackage(name).then((package) => {
+    res.json(package);
   });
 });
 
