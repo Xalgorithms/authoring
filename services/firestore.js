@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 const faker = require('faker');
 const packages =  require('./packages');
 
-var serviceAccount = require('../xalgo-authoring-ui-4c337bb3b154.json');
+var serviceAccount = process.env.FIREBASE_PRIVATE_KEY || require('../xalgo-authoring-ui-4c337bb3b154.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
