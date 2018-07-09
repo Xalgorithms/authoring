@@ -18,16 +18,16 @@ const octokit = require('@octokit/rest')({
   debug: true
 });
 
-const config = require('../config');
 const auth = require('./auth');
 const utils = require('./utils');
 
-auth.init(octokit);
+const { OWNER, REPO } = process.env;
+auth.setAccessToken(octokit);
 
 async function getPackages() {
   const {data: commits} = await octokit.repos.getCommits({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
   });
 
   if (!commits.length) {
@@ -37,8 +37,8 @@ async function getPackages() {
   const commit = commits[0];
 
   const {data: { tree }} = await octokit.gitdata.getTree({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
     tree_sha: commit.sha,
     recursive: 1
   });
@@ -71,8 +71,8 @@ async function createPackage(name) {
   const content = utils.base64encode('');
 
   await octokit.repos.createFile({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
     path,
     message,
     content,
@@ -86,8 +86,8 @@ async function createPackage(name) {
 async function createFile(path, content) {
   const message = "New change";
   const {data} = await octokit.repos.createFile({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
     path,
     message,
     content: utils.base64encode(content),
@@ -99,8 +99,8 @@ async function createFile(path, content) {
 async function updateFile(path, content, sha) {
   const message = "New change";
   const {data} = await octokit.repos.updateFile({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
     path,
     message,
     content: utils.base64encode(content),
@@ -112,8 +112,8 @@ async function updateFile(path, content, sha) {
 
 async function getPackageInfo(path) {
   const {data} = await octokit.repos.getContent({
-    owner: config.OWNER,
-    repo: config.REPO,
+    owner: OWNER,
+    repo: REPO,
     path,
   });
 

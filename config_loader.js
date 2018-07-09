@@ -14,8 +14,18 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
+const YAML = require('yamljs');
+
 module.exports = {
-  APP_ID: 13982,
-  OWNER: 'hpilosyan',
-  REPO: 'libgit2-test',
+  load: () => {
+    // Load manually in development
+    if (process.env.NODE_ENV !== 'production') {
+      const conf = YAML.load('app.yaml');
+      const { env_variables } = conf;
+
+      for (const [key, value] of Object.entries(env_variables)) {
+        process.env[key] = value;
+      }
+    }
+  }
 };
