@@ -20,7 +20,11 @@
     "cz-conventional-changelog": "2.1.0",
     "ghooks": "2.0.4"
   },
+  "engines": {
+    "node": ">=8.11.0"
+  },
   "scripts": {
+    "start": "node index.js",
     "commit": "git-cz"
   },
   "author": "Hayk Pilosyan <hayk.pilos@gmail.com>",
