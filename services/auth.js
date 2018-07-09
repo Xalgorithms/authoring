@@ -17,8 +17,6 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-const config = require('../config');
-
 function generateJwt (id, cert) {
   const payload = {
     iat: Math.floor(new Date() / 1000),       // Issued at time
@@ -30,7 +28,7 @@ function generateJwt (id, cert) {
   return jwt.sign(payload, cert,  {algorithm: 'RS256' })
 }
 
-async function init(octokit) {
+async function setAccessToken(octokit) {
   const token = getToken();
 
   octokit.authenticate({
@@ -45,22 +43,25 @@ async function init(octokit) {
     type: 'token',
     token: access_token,
   });
+
+  return access_token;
 }
 
 async function getInstallationId(octokit) {
   const {data: installations} = await octokit.apps.getInstallations();
   const installation = installations.find(function (i) {
-    return i.app_id === config.APP_ID;
+    return i.app_id === parseInt(process.env.APP_ID, 10);
   });
+
 
   return installation && installation.id;
 }
 
 function getToken() {
-  return generateJwt(config.APP_ID, process.env.PRIVATE_KEY || fs.readFileSync('private-key.pem'));
+  return generateJwt(process.env.APP_ID, process.env.PRIVATE_KEY || fs.readFileSync('private-key.pem'));
 }
 
 module.exports = {
-  init,
+  setAccessToken,
   getToken
 };
